@@ -6,6 +6,8 @@ firebase_admin.initialize_app(cred)
 from flask import Flask,render_template,request #透過request抓前端的值
 from datetime import datetime, timezone, timedelta
 
+import requests
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
@@ -22,6 +24,7 @@ def index():
     homepage += "<br><a href=/read>人選之人─造浪者演員查詢</a><br>"
     homepage += "<br><a href=/books>精選圖書列表</a><br>"
     homepage += "<br><a href=/query>書名查詢</a><br>"
+    homepage += "<br><a href=/spider>爬取網頁資訊</a><br>"
 
 
     return homepage
@@ -103,6 +106,21 @@ def query():
 
     else:
         return render_template("ex1.html")
+
+@app.route("/spider")
+def spider():
+    url = "https://www1.pu.edu.tw/~tcyang/course.html"
+    Data = requests.get(url)
+    Data.encoding = "utf-8"
+    # print(Data.text)
+    sp = BeautifulSoup(Data.text, "html.parser")
+
+    results = sp.select(".team-box")  # 取多筆
+    Result = ''
+    for result in results:
+        Result += result.text + "<br>"
+        Result += result.find('a').get('href') + "<br>" + "<br>"  # 取一筆
+    return Result
 
 if __name__ == '__main__':
     app.run(debug=True)
