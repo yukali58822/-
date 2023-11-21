@@ -2,20 +2,18 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
-db = firestore.client()
 
 from flask import Flask,render_template,request #透過request抓前端的值
 from datetime import datetime, timezone, timedelta
 
 
 app = Flask(__name__)
-app.template_folder = 'D:\\PycharmProjects\\20231114\\templates'
 
 
 # 靜態網頁
 @app.route('/')
 def index():
-    homepage = "<h1>謝佩宸的Python網頁1121</h1>"
+    homepage = "<h1>謝佩宸的Python網頁</h1>"
     homepage+= "<a href=/mis>MIS單純傳入文字</a><br>"
     homepage+= "<a href=/today>顯示日期與時間</a><br>"
     homepage+= "<a href=/welcome?keyword=PEI>傳入使用者名稱</a><br>"
@@ -71,6 +69,7 @@ def read():
 @app.route("/books")
 def books():
     Result = ""
+    db = firestore.client()
     collection_ref = db.collection("圖書精選")
     docs = collection_ref.get()
     for doc in docs:
@@ -90,6 +89,7 @@ def query():
         result = "您輸入的關鍵字是：" + keyword
 
         Result = ""
+        db = firestore.client()
         collection_ref = db.collection("圖書精選")
         docs = collection_ref.get()
         for doc in docs:
