@@ -118,7 +118,7 @@ def spider():
     results = sp.select(".team-box")  # 取多筆
     Result = ''
     for result in results:
-        Result += result.text + "<br>"
+        Result += "<a href=" + result.find('a').get('href') + ">" + result.text + "</a><br>"
         Result += result.find('a').get('href') + "<br>" + "<br>"  # 取一筆
     return Result
 
