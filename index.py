@@ -31,6 +31,8 @@ def index():
     homepage += "<br><a href=/searchQ>查詢開眼電影即將上映影片</a><br>"
 
 
+
+
     return homepage
 
 @app.route('/mis')
@@ -128,37 +130,39 @@ def spider():
 
 @app.route("/movie")
 def movie():
-    url = "http://www.atmovies.com.tw/movie/next/"
-    Data = requests.get(url)
-    Data.encoding = "utf-8"
-    sp = BeautifulSoup(Data.text, "html.parser")
-    result = sp.select(".filmListAllX li")
-    lastUpdate = sp.find("div", class_="smaller09").text[5:]
+  url = "http://www.atmovies.com.tw/movie/next/"
+  Data = requests.get(url)
+  Data.encoding = "utf-8"
+  sp = BeautifulSoup(Data.text, "html.parser")
+  result=sp.select(".filmListAllX li")
+  lastUpdate = sp.find("div", class_="smaller09").text[5:]
 
-    for item in result:
-        picture = item.find("img").get("src").replace(" ", "")
-        title = item.find("div", class_="filmtitle").text
-        movie_id = item.find("div", class_="filmtitle").find("a").get("href").replace("/", "").replace("movie", "")
-        hyperlink_html = '<a href="{}">{}</a>'.format(item.find("a").get("href"), item.find("a").text)
-        show = item.find("div", class_="runtime").text.replace("上映日期：", "")
-        show = show.replace("片長：", "")
-        show = show.replace("分", "")
-        showDate = show[0:10]
-        showLength = show[13:]
+  for item in result:
+    picture = item.find("img").get("src").replace(" ", "")
+    title = item.find("div", class_="filmtitle").text
+    movie_id = item.find("div", class_="filmtitle").find("a").get("href").replace("/", "").replace("movie", "")
+    hyperlink = "http://www.atmovies.com.tw" + item.find("div", class_="filmtitle").find("a").get("href")
+    hyperlink = "<a href=" + hyperlink + ">" + hyperlink + "</a><br>"
+    show = item.find("div", class_="runtime").text.replace("上映日期：", "")
+    show = show.replace("片長：", "")
+    show = show.replace("分", "")
+    showDate = show[0:10]
+    showLength = show[13:]
 
-        doc = {
-            "title": title,
-            "picture": picture,
-            "hyperlink": hyperlink_html,
-            "showDate": showDate,
-            "showLength": showLength,
-            "lastUpdate": lastUpdate
-        }
+    doc = {
+        "title": title,
+        "picture": picture,
+        "hyperlink": hyperlink,
+        "showDate": showDate,
+        "showLength": showLength,
+        "lastUpdate": lastUpdate
+      }
 
-        db = firestore.client()
-        doc_ref = db.collection("電影").document(movie_id)
-        doc_ref.set(doc)
-    return "近期上映電影已爬蟲及存檔完畢，網站最近更新日期為：" + lastUpdate
+    db = firestore.client()
+    doc_ref = db.collection("電影").document(movie_id)
+    doc_ref.set(doc)
+  return "近期上映電影已爬蟲及存檔完畢，網站最近更新日期為：" + lastUpdate
+
 
 
 @app.route("/search")
@@ -174,6 +178,7 @@ def search():
             info += "片長：" + doc.to_dict()["showLength"] + " 分鐘<br>"
             info += "上映日期：" + doc.to_dict()["showDate"] + "<br><br>"
     return info
+
 
 @app.route("/searchQ", methods=["POST","GET"])
 def searchQ():
@@ -192,6 +197,7 @@ def searchQ():
         return info
     else:
         return render_template("input.html")
+
 
 if __name__ == '__main__':
     app.run(debug=True)
