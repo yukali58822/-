@@ -5,11 +5,13 @@
     <title>Title</title>
 </head>
 <body>
-  <form method="post">
-    請輸入欲查詢的片名：
-    <input type="text" name="MovieTitle" />
-    <button type="submit">確定送出</button>
-</form>
+    {{ hyperlink_html | safe }}
+    <form method="post">
+        請輸入欲查詢的片名：
+        <input type="text" name="MovieTitle" />
+        <button type="submit">確定送出</button>
+    </form>
+
 
 </body>
 </html>
